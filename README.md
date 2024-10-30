@@ -129,9 +129,9 @@ We currently only provide the code for the inference section. You can use the ch
 We also provide the pretrained model trained on `KITTI-360` and `Waymo` and you can download the pre-trained models from  [here](https://drive.google.com/drive/folders/19TfuF-TCNz31rqsMDlI7ghC1i0vYy01c). Place the downloaded checkpoints in `checkpoint` in order to test it later.
 
 ### Feed-forward Inference
-We further provide the different sparsity levels (50%, 80% or 90%) to validate our methods, where a higher drop rate signifies a more sparsely populated set of reference images.
+We further provide the different sparsity levels (50%, 80% or 90%) to validate our methods, where a higher drop rate signifies a more sparsely populated set of reference images.Replace `$Data_Dir$` with your data path.
 ```
-python scripts/infere_zeroshot.py neuralpnt  --config_file config/test_GVS_nerf.yaml --pipeline.model.mode=val zeronpt-data --data $Data_Dir$seq_04_nerfacto_0382_40 --drop80=True --include_depth_map=True
+python scripts/infere_zeroshot.py neuralpnt  --config_file config/test_GVS_nerf.yaml --pipeline.model.mode=val zeronpt-data --data $Data_Dir$/seq_04_nerfacto_0382_40 --drop80=True --include_depth_map=True
 ```
 If you want to test on other sparsity setting, replace the `--drop80=True` with `--drop50=True` or `--drop90=True`.
 
