@@ -1,0 +1,37 @@
+loss_coeff:
+  sky_loss_coffe: 0.01
+  semantic_loss_coffe: 0.1
+  denisty_loss_coff: 0.1
+  weight_loss_coff : 1
+  uniform_samples : 40
+  depth_loss_coffe: 0.1
+  URF_entropyloss: 0.01
+  fgbg_entropyloss: 0.002
+
+data_manager:
+  num_neighbour_select: 3
+
+Optimize_scene: False
+training_scenes: 75
+# training_scenes: 75
+individual_embedding: False
+average_embedding: True
+# Mask_points: False  ## 在一个 场景上做实验的时候 设置为False, 有助于过拟合
+Mask_points: True  ## 在一个 场景上做实验的时候 设置为False, 有助于过拟合
+use_3d_semantic: True
+init_volume: False
+
+bg_model:
+  # basis
+    use_semantics: False
+    max_res: 512
+    log2_hashmap_size: 18
+
+sampling:
+    n_sampling: 80
+    n_importance: 48
+    up_sample_steps: 3   ## excute 4 times coarse-to-fine sampling
+    
+  
+
+  

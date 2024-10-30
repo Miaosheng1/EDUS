@@ -1,0 +1,38 @@
+## 这个 Config 适用于 在 Test 场景 加上2D semantic map 监督，提取 Semantic Voxel 
+loss_coeff:
+  sky_loss_coffe: 0.1
+  semantic_loss_coffe: 0.1
+  denisty_loss_coff: 0.1
+  URF_entropyloss: 0.01
+  weight_loss_coff : 1
+  uniform_samples : 40
+  fgbg_entropyloss: 0.002
+
+data_manager:
+  num_neighbour_select: 3
+  bounding_box_min: [-12.8, -9, -20]
+  bounding_box_max: [12.8, 3.8, 31.2]
+  voxel_size: 0.2
+
+
+ckpt_path: "checkpoint/80scene_depth_occlusion_bino_ckpt" 
+
+Optimize_scene: True
+training_scenes: 1
+individual_embedding: True
+average_embedding: False
+Mask_points: False
+use_3d_semantic: False
+use_2d_semantic: False
+init_volume: True
+
+
+## excute 3 times coarse-to-fine sampling
+sampling:
+    n_sampling: 80
+    n_importance: 48
+    up_sample_steps: 3   
+    
+  
+
+  

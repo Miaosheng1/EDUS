@@ -1,0 +1,3 @@
+
+Pretrain on Waymo:  https://drive.google.com/drive/folders/1phk5wrrcEICwc4NrO64UJseKnjfBrOZ2?usp=drive_link
+Pretrain on KITTI360: https://drive.google.com/drive/folders/1jBmf4MQghdTIDmtfUBq8EEWUlrRJtHaj?usp=drive_link
