@@ -5,7 +5,7 @@
 Sheng Miao*, [Jiaxin Huang*](https://jaceyhuang.github.io/), Dongfeng Bai, Weichao Qiu, Bingbing Liu, [Andreas Geiger](https://www.cvlibs.net/) and [Yiyi Liao](https://yiyiliao.github.io/) 
 
 Our project page can be seen [here](https://xdimlab.github.io/EDUS/).
-<img src="./docs/teaser.png" height="200">>
+<img src="./docs/teaser.png" height="200">
 ## :book: Datasets
 We evaluate our model on [KITTI-360](http://www.cvlibs.net/datasets/kitti-360/) and [Waymo](https://waymo.com/open/download/). Here we show the structure of a test dataset as follow. We provide the preprocessed data for inference on KITTI-360, which contains 5 validation scenes. We exploit the `Metric3d` for metric depth predictions and `HRNet` for sky mask segmentation.
 
@@ -33,11 +33,11 @@ The dataset should have a structure as follows:
         ├── transfroms.json
 ```
 
-## :house: Install EDUS:  Setup the environment
+## :house: Installation
 Our EDUS is built on [nerfstudio](https://github.com/nerfstudio-project/nerfstudio). You can follow the nerfstudio webpage to install our code.  
 
-#### Create environment
 
+#### Create environment
 ```bash
 conda create --name EDUS -y python=3.8
 conda activate EDUS
@@ -61,17 +61,22 @@ cd EDUS
 pip install --upgrade pip setuptools
 pip install -e .
 ```
-## :chart_with_upwards_trend: Experiments on KITTI-360 Datasets
-Download the checkpoint to perform inference on KITTI-360. We provide the pretrained model trained on `KITTI-360` and `Waymo` and you can download the pre-trained models from  [here](https://drive.google.com/drive/folders/19TfuF-TCNz31rqsMDlI7ghC1i0vYy01c). 
+## :chart_with_upwards_trend: Evaluation & Checkpoint
+We provide the pretrained model trained on `KITTI-360` and `Waymo` and you can download the pre-trained models from  [here](https://drive.google.com/drive/folders/19TfuF-TCNz31rqsMDlI7ghC1i0vYy01c). We recommend the checkpoint trained from `KITTI-360` to get better results.
 
 Place the downloaded and put checkpoints in `checkpoint` folder in order to test it later.
 
 ### Feed-forward Inference
-We further provide the different sparsity levels (50%, 80%) to validate our methods, where a higher drop rate corresponds to a more sparsely populated set of reference images. Replace `$Data_Dir$` with your data path.
+We provide the different sparsity levels (50%, 80%) to validate our methods, where a higher drop rate corresponds to a more sparsely populated set of reference images. Replace `$Data_Dir$` with your data path.
 ```
-python scripts/infere_zeroshot.py neuralpnt  --config_file config/test_GVS_nerf.yaml --pipeline.model.mode=val zeronpt-data --data $Data_Dir$ --drop50=True --include_depth_map=True
+python scripts/infere_zeroshot.py neuralpnt --config_file config/test_GVS_nerf.yaml 
+--pipeline.model.mode=val 
+zeronpt-data 
+--data $Data_Dir$ 
+--drop50=True 
+--include_depth_map=True
 ```
-If you want to test on other sparsity setting, replace the `--drop50=True` with `--drop80=True`.
+Replace the `--drop50=True` with `--drop80=True` to inference on `Drop80` setting.
 
 ## :clipboard: Citation
 
