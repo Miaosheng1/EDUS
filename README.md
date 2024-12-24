@@ -7,9 +7,12 @@ Sheng Miao*, [Jiaxin Huang*](https://jaceyhuang.github.io/), Dongfeng Bai, Weich
 Our project page can be seen [here](https://xdimlab.github.io/EDUS/).
 <img src="./docs/teaser.png" height="200">
 ## :book: Datasets
-We evaluate our model on [KITTI-360](http://www.cvlibs.net/datasets/kitti-360/) and [Waymo](https://waymo.com/open/download/). Here we show the structure of a test dataset as follow. We provide the preprocessed data for inference on KITTI-360, which contains 5 validation scenes. We exploit the `Metric3d` for metric depth predictions and `HRNet` for sky mask segmentation.
+We evaluate our model on [KITTI-360](http://www.cvlibs.net/datasets/kitti-360/) and [Waymo](https://waymo.com/open/download/). Here we show the structure of a test dataset as follow. You can download validation data directly from 🤗 [Hugging Face](https://huggingface.co/datasets/cookiemiao/EDUS_infer_dataset/tree/main). 
+* We provide the preprocessed data for inference on KITTI-360, which contains 5 validation scenes. 
+* We exploit the [Metric3d](https://github.com/YvanYin/Metric3D/tree/main) for metric depth predictions and [hierarchical-multi-scale-attention](https://github.com/segcv/hierarchical-multi-scale-attention) for sky mask segmentation. 
+* We pre-voxelize the accmulated global pointcloud `xxx.ply` to numpy array in `voxel` folder. We set voxel size `[0.2m,0.2m,0.2m]` as described in the main paper.
 
-You can download validation data directly from 🤗 [Hugging Face](https://huggingface.co/datasets/cookiemiao/EDUS_infer_dataset/tree/main). 
+
 
 The dataset should have a structure as follows:
 ```
@@ -81,9 +84,9 @@ pip install inplace-abn
 
 
 ## :chart_with_upwards_trend: Evaluation & Checkpoint
-We provide the pretrained model trained on `KITTI-360` and `Waymo` and you can download the pre-trained models from  [here](https://huggingface.co/datasets/cookiemiao/EDUS_infer_dataset/tree/main). We recommend the checkpoint trained from `KITTI-360` to get better results.
+We provide the pretrained model trained on `KITTI-360` and `Waymo` and you can download the pre-trained models from  [here](https://huggingface.co/datasets/cookiemiao/EDUS_infer_dataset/tree/main). We recommend the checkpoint `pretrain_kitti360.pth` which is trained from KITTI-360.
 
-Place the downloaded and put checkpoints in `checkpoint` folder in order to test it later.
+Place the downloaded checkpoints in `checkpoint` folder in order to test it later.
 
 ### Feed-forward Inference
 We provide the different sparsity levels (50%, 80%) to validate our methods, where a higher drop rate corresponds to a more sparsely populated set of reference images. Replace `$Data_Dir$` with your data path.
