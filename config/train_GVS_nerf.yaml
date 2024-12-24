@@ -12,12 +12,10 @@ data_manager:
   num_neighbour_select: 3
 
 Optimize_scene: False
-training_scenes: 75
-# training_scenes: 75
+training_scenes: 80
 individual_embedding: False
 average_embedding: True
-# Mask_points: False  ## 在一个 场景上做实验的时候 设置为False, 有助于过拟合
-Mask_points: True  ## 在一个 场景上做实验的时候 设置为False, 有助于过拟合
+Mask_points: True  
 use_3d_semantic: True
 init_volume: False
 

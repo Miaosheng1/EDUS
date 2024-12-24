@@ -1,4 +1,3 @@
-## 这个 Config 适用于 在 Test 场景 加上2D semantic map 监督，提取 Semantic Voxel 
 loss_coeff:
   sky_loss_coffe: 0.1
   semantic_loss_coffe: 0.1
