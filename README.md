@@ -44,10 +44,10 @@ conda activate EDUS
 pip install --upgrade pip
 ```
 #### Dependencies
-Install PyTorch with CUDA (this repo has been tested with CUDA 11.7).
+Install PyTorch with CUDA (this repo has been tested with CUDA 11.8).
 ```bash
-pip install torch==2.0.1+cu117 torchvision==0.15.2+cu117 --extra-index-url https://download.pytorch.org/whl/cu117
-conda install -c "nvidia/label/cuda-11.7.1" cuda-toolkit
+pip install torch==2.1.2+cu118 torchvision==0.16.2+cu118 --extra-index-url https://download.pytorch.org/whl/cu118
+conda install -c "nvidia/label/cuda-11.8.0" cuda-toolkit
 ```
 After pytorch, install [tiny-cuda-nn](https://github.com/NVlabs/tiny-cuda-nn):
 ```bash
@@ -61,16 +61,35 @@ cd EDUS
 pip install --upgrade pip setuptools
 pip install -e .
 ```
+
+
+<details>
+<summary>Troubleshooting</summary>
+<br>
+
+- When installing the `inplace-abn` library, it does not check your CUDA version. If you encounter the following error while running:
+```bash
+libtorch_cuda_cu.so: cannot open shared object file: No such file or directory
+```
+Please reinstall `inplace-abn` to match with your CUDA version.
+```bash
+pip uninstall inplace-abn
+rm -r ~/.cache/pip
+pip install inplace-abn
+```
+</details>
+
+
 ## :chart_with_upwards_trend: Evaluation & Checkpoint
-We provide the pretrained model trained on `KITTI-360` and `Waymo` and you can download the pre-trained models from  [here](https://drive.google.com/drive/folders/19TfuF-TCNz31rqsMDlI7ghC1i0vYy01c). We recommend the checkpoint trained from `KITTI-360` to get better results.
+We provide the pretrained model trained on `KITTI-360` and `Waymo` and you can download the pre-trained models from  [here](https://huggingface.co/datasets/cookiemiao/EDUS_infer_dataset/tree/main). We recommend the checkpoint trained from `KITTI-360` to get better results.
 
 Place the downloaded and put checkpoints in `checkpoint` folder in order to test it later.
 
 ### Feed-forward Inference
 We provide the different sparsity levels (50%, 80%) to validate our methods, where a higher drop rate corresponds to a more sparsely populated set of reference images. Replace `$Data_Dir$` with your data path.
 ```
-python scripts/infere_zeroshot.py neuralpnt --config_file config/test_GVS_nerf.yaml 
---pipeline.model.mode=val 
+python scripts/infere_zeroshot.py edus
+ --config_file config/test_GVS_nerf.yaml 
 zeronpt-data 
 --data $Data_Dir$ 
 --drop50=True 
@@ -80,7 +99,7 @@ Replace the `--drop50=True` with `--drop80=True` to inference on `Drop80` settin
 
 ## :clipboard: Citation
 
-If our work is useful for your research, please consider citing:
+If our work is useful for your research, please give me a star and consider citing:
 
 ```
 @inproceedings{miao2025efficient,

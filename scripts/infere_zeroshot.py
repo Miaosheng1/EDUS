@@ -87,8 +87,9 @@ def infer_loop(local_rank: int, world_size: int, config: cfg.Config, global_rank
                 print("image {} PSNR:{} ,SSIM: {}, LPIPS: {}".format(i,psnr,SSIM,lpips))
    
     CONSOLE.print(f"[bold green]Average PSNR:{sum_psnr/ num_eval_images}",justify="center")
-    CONSOLE.print(f"[bold green]Average PSNR:{sum_ssim / num_eval_images}",justify="center")
-    CONSOLE.print(f"[bold green]Average PSNR:{sum_lpips/num_eval_images}",justify="center")
+    CONSOLE.print(f"[bold green]Average SSIM:{sum_ssim / num_eval_images}",justify="center")
+    CONSOLE.print(f"[bold green]Average Lpips:{sum_lpips/num_eval_images}",justify="center")
+    CONSOLE.print(f"[bold yellow] Results are saved in {save_dir}.")
    
 
 def render_interpolate_camera(camera,trainder,save_dir=None):

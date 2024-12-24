@@ -95,16 +95,6 @@ class Projector():
         return ray_diff
 
     def compute(self,  xyz, train_imgs, train_cameras, train_depths=None):
-        '''
-        :param xyz: [n_rays, n_samples, 3]
-        :param query_camera: [1, 34], 34 = img_size(2) + intrinsics(16) + extrinsics(16)
-        :param train_imgs: [1, n_views, h, w, 3]
-        :param train_cameras: [1, n_views, 34]
-        :param featmaps: [n_views, d, h, w]
-        :return: rgb_feat_sampled: [n_rays, n_samples, 3+n_feat],
-                 ray_diff: [n_rays, n_samples, 4],
-                 mask: [n_rays, n_samples, 1]
-        '''
         img = train_imgs.detach()
         xyz = xyz.frustums.get_positions()
         train_imgs = train_imgs.permute(0, 3, 1, 2).cuda()  # [n_views, 3, h, w]
@@ -119,7 +109,7 @@ class Projector():
         rgbs_sampled = F.grid_sample(train_imgs, normalized_pixel_locations, align_corners=True)
         rgb_sampled = rgbs_sampled.permute(2, 3, 0, 1)  # [n_rays, n_samples, n_views, 3]
 
-        ## depth sampling (occulsion judge)
+        ## if depths are available, we utlize the depth for occlusion check
         if train_depths is not None:
             train_depths = train_depths.unsqueeze(-1).permute(0, 3, 1, 2).cuda() # [n_views, 3, h, w]
             depths_sampled = F.grid_sample(train_depths, normalized_pixel_locations, align_corners=True)
@@ -132,7 +122,6 @@ class Projector():
 
         if train_depths is not None:
             depth = depths_sampled.masked_fill(mask==0,0)
-            # self.verify_projection(xyz=xyz,rgb=rgb,img=img,camera=train_cameras)
             rgb = self.occlusion_check(rgbs=rgb,
                                         sampled_depth=depth,
                                         projection_depth= (project_depth*mask_in_front).permute(1, 2, 0)[..., None],
@@ -147,45 +136,9 @@ class Projector():
         no_occlusion = torch.logical_not(projection_depth - sampled_depth> depth_delta) 
         all_false = ~no_occlusion.any(dim=2, keepdim=True).expand(-1, -1, 3, -1)
         no_occlusion[all_false] = True
-
         modify_rgbs = no_occlusion * rgbs
-
-
-        # true_colors_sum = torch.sum(modify_rgbs, dim=2)
-        # true_counts = torch.sum(no_occlusion,dim=2)
-        # avg_true_colors = true_colors_sum / torch.maximum(true_counts, torch.tensor(1))
-        # modify_rgbs = torch.where(~no_occlusion, avg_true_colors.unsqueeze(-1).repeat(1,1,1,3), rgbs)
-
-        # exit()
-
-        """ debug 投影点并且可视化"""
-        # smapled_id = 50
-        # sampled_uv = pixel_locations[:,0,smapled_id,:]
-        # for i in range(3):
-        #     cur_img = train_imgs[i].permute(1,2,0).detach().cpu().numpy()*255
-        #     image = Image.fromarray(cur_img.astype(np.uint8))
-        #     cur_location = sampled_uv[i]
-        #     draw = ImageDraw.Draw(image)
-        #     draw.ellipse((cur_location[0] - 5, cur_location[1] - 5, cur_location[0] + 5, cur_location[1] + 5), outline='red', width=3)
-        #     image.save(f'projiect{i}.png')
-
-
-            
-
         return modify_rgbs
     
-
-    # def verify_projection(self,xyz,rgb,img,camera):
-    #     save_dir = "project"
-    #     os.makedirs(save_dir,exist_ok=True)
-    #     np.save(os.path.join(save_dir,"xyz.npy"),xyz.detach().cpu().numpy())
-    #     np.save(os.path.join(save_dir,"pose.npy"),camera.squeeze().detach().cpu().numpy())
-    #     np.save(os.path.join(save_dir,"sample_rgb.npy"),rgb.detach().cpu().numpy())
-    #     import imageio
-    #     imageio.imwrite(os.path.join(save_dir,"source.png"), img.squeeze().detach().cpu().numpy())
-    #     exit()
-    #     return
-
 
 
 

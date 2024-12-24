@@ -15,7 +15,7 @@ data_manager:
   voxel_size: 0.2
 
 
-ckpt_path: "checkpoint/80scene_depth_occlusion_bino_ckpt" 
+ckpt_path: "checkpoint/pretrain_kitti360.pth" 
 
 Optimize_scene: True
 training_scenes: 1

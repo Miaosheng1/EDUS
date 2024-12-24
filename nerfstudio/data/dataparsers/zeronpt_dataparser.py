@@ -60,7 +60,7 @@ class ZeronptDataParserConfig(DataParserConfig):
     include_semantic_map: bool = False
     """Whether load semantic"""
     include_depth_map: bool = False
-    """Whether load predicted depth map"""
+    """Whether load predicted depth map. We use the depth for occlusion check"""
     config_file: Optional[str] = 'config/test_GVS_nerf.yaml'
     """EDUS config filepath"""
     drop50: bool = True
@@ -304,6 +304,7 @@ class Zeronpt(DataParser):
             voxelized_data = np.load(self.config.data /  f"{seq_id}_mono_volume.npy")[None,...]
         else:
             voxelized_data = np.load(self.config.data / voxel_dir / f"{seq_id}_volume.npy")[None,...]
+
         bounding_box_min = self.config.bounding_box_min 
         bounding_box_max = self.config.bounding_box_max 
         voxel_size = np.array([self.config.voxel_size]*3)
@@ -315,7 +316,7 @@ class Zeronpt(DataParser):
             "voxel_size":voxel_size,
             "scale_factor":scale_factor,
         }
-        dataparser_outputs.volume_dict = Input_volume
+        dataparser_outputs.volume_dict = Input_volume # type: ignore
 
 
         return dataparser_outputs
@@ -347,3 +348,5 @@ class Zeronpt(DataParser):
         if self.downscale_factor > 1:
             return self.config.data / f"{downsample_folder_prefix}{self.downscale_factor}" / filepath.name
         return self.config.data / filepath
+    
+    

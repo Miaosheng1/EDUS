@@ -64,13 +64,6 @@ from nerfstudio.model_components.projection import Projector
 
 CONSOLE = Console(width=120)
 
-"""
-Todo List:
-1. clean the 3D feature encoder
-2. process the checkpoint and merge it to one model(Retrive)  
-3. delete the ouutputs directory
-"""
-
 @dataclass
 class EDUSConfig(ModelConfig):
     """Nerfacto Model Config"""
@@ -109,7 +102,7 @@ class EDUSModel(Model):
 
         self.scene_contraction = SceneContraction(order=float("inf"))
         self.base_conf = OmegaConf.load(self.config_file)
-
+        assert volume_dict is not None
         ## Encoder 3D voxel
         voxel_bank = volume_dict['data']
         volume_res = (voxel_bank.shape[2],voxel_bank.shape[1],voxel_bank.shape[3])
@@ -156,26 +149,30 @@ class EDUSModel(Model):
 
         self.projector = Projector(intrinsics=self.intrinsics)
 
-        ## Load CKPT
+
+        ## Load pretrained Checkpoint 
         if self.base_conf['Optimize_scene']:
             ckpt_path = self.base_conf['ckpt_path']
-            self.encoder.load_state_dict(torch.load(f'{ckpt_path}/encoder.pth'),strict=False)
+            self.encoder.load_state_dict(torch.load(ckpt_path)['encoder'],strict=False)
 
             ## filed checkpoint
-            state_dict = torch.load(f'{ckpt_path}/field.pth')
+            state_dict = torch.load(ckpt_path)['field']
             state_dict.pop('aabb')
-             ## appearance embedding
+            """NOTE: Add Appearance Embedding
+            We designate the 1st training scene appearance embedding for the novel scenes;
+            This appearance embedding vector can be further finetuned in the finetuning stage
+            """
             if state_dict['embedding_appearance.embedding.weight'] is not None:
                 original_weight = state_dict['embedding_appearance.embedding.weight']
-                adjusted_weight = original_weight[:self.num_train_data]  # 假设我们通过截断来调整形状
+                adjusted_weight = original_weight[:self.num_train_data] 
                 state_dict['embedding_appearance.embedding.weight'] = adjusted_weight
             self.field.load_state_dict(state_dict,strict=False)
 
             ## background appearance embedding
-            bg_state_dict = torch.load(f'{ckpt_path}/bg_field.pth')
+            bg_state_dict = torch.load(ckpt_path)['bg_field']
             if bg_state_dict['embedding_appearance.embedding.weight'] is not None:
                 original_weight = bg_state_dict['embedding_appearance.embedding.weight']
-                adjusted_weight = original_weight[self.num_train_data*4:self.num_train_data*5]  # 假设我们通过截断来调整形状
+                adjusted_weight = original_weight[:self.num_train_data] 
                 bg_state_dict['embedding_appearance.embedding.weight'] = adjusted_weight
             bg_state_dict.pop('aabb')
             self.field_background.load_state_dict(bg_state_dict,strict=False)
@@ -247,7 +244,8 @@ class EDUSModel(Model):
                                       feat_volume=self.feat_volume)
         
         """ Retrive 2D feature from the source image"""
-        n_views = int(ray_bundle.source_poses.shape[0]-1)
+        assert ray_bundle.source_poses is not None
+        n_views = int(ray_bundle.source_poses.shape[0]-1) # type: ignore
         sampled_rgb = self.projector.compute(xyz = ray_samples, 
                                             train_imgs = ray_bundle.source_images,
                                             train_cameras = ray_bundle.source_poses[:n_views,...],
@@ -255,7 +253,7 @@ class EDUSModel(Model):
                                             )  # [N_rays, N_samples, N_views, 3] 
                                         
 
-        field_outputs = self.field(ray_samples, compute_normals=False, scene_id=ray_bundle.scene_id[0],
+        field_outputs = self.field(ray_samples, compute_normals=False, scene_id=ray_bundle.scene_id[0], # type: ignore
                                    feature_volume=self.feat_volume,color_volume = sampled_rgb)
         
         field_outputs = scale_gradients_by_distance_squared(field_outputs, ray_samples)
@@ -283,7 +281,7 @@ class EDUSModel(Model):
  
             field_outputs_bg = self.field_background.background_generate(ray_samples=ray_samples_bg,
                                                                          sampled_rgb=sampled_bg_rgb,
-                                                                         scene_id = ray_bundle.scene_id[0])
+                                                                         scene_id = ray_bundle.scene_id[0]) # type: ignore
             weights_bg = ray_samples_bg.get_weights(field_outputs_bg[FieldHeadNames.DENSITY])
           
             rgb_bg = self.renderer_rgb(rgb=field_outputs_bg[FieldHeadNames.RGB], 
@@ -309,7 +307,7 @@ class EDUSModel(Model):
 
 
         if not self.training:
-             depth_bg = self.renderer_depth(weights=weights_bg, ray_samples=ray_samples_bg)
+             depth_bg = self.renderer_depth(weights=weights_bg, ray_samples=ray_samples_bg) # type: ignore
              outputs["bg_accumulation"] = (1.0-bg_transmittance) * accumulation_bg
              outputs['bg_depth'] = (1.0-bg_transmittance) * depth_bg
              outputs['bg_rgb'] = (1.0-bg_transmittance) * torch.sum(weights_bg * field_outputs_bg[FieldHeadNames.RGB], dim=-2)
