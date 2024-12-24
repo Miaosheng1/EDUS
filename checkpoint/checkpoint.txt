@@ -1,1 +1,1 @@
-downloead the ckeckpoint from: https://huggingface.co/datasets/cookiemiao/EDUS_infer_dataset/tree/main
+download the ckeckpoint from: https://huggingface.co/datasets/cookiemiao/EDUS_infer_dataset/tree/main
